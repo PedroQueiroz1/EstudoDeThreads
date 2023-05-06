@@ -1,4 +1,4 @@
-package projetoThreadJava;
+package projeto2ThreadJava;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -22,51 +22,16 @@ public class TelaTempoThread extends JDialog {
 	
 	//Painel de componentes
 	private JPanel jPanel = new JPanel(new GridBagLayout());
-	private JLabel descricaoHora = new JLabel("Tempo Thread 1");
+	private JLabel descricaoHora = new JLabel("Nome");
 	private JTextField mostraTempo = new JTextField();
 	
-	private JLabel descricaoHora2 = new JLabel("Tempo Thread 2");
+	private JLabel descricaoHora2 = new JLabel("E-mail");
 	private JTextField mostraTempo2 = new JTextField();
 	
-	private JButton jButton = new JButton("Start");
+	private JButton jButton = new JButton("Add Lista");
 	private JButton jButton2 = new JButton("Stop");
-	
-	private Runnable thread1 = new Runnable() {
 
-		@Override
-		public void run() {
-			while(true) {
-				mostraTempo.setText(
-						new SimpleDateFormat("dd/MM/yyyy hh:mm.ss")
-						.format(Calendar.getInstance().getTime()));
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	};
-	
-	private Runnable thread2 = new Runnable() {
-
-		@Override
-		public void run() {
-			while(true) {
-				mostraTempo2.setText(
-						new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
-						.format(Calendar.getInstance().getTime()));
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	};
-	
-	private Thread thread1Tempo;
-	private Thread thread2Tempo;
+	private ImplementacaoFilaThread fila = new ImplementacaoFilaThread(); 
 	
 	public TelaTempoThread() {
 		setTitle("Minha tela tempo com Thread");
@@ -92,7 +57,6 @@ public class TelaTempoThread extends JDialog {
 		
 		mostraTempo.setPreferredSize(new Dimension(200,25));
 		gridBagConstraints.gridy ++;
-		mostraTempo.setEditable(false);
 		jPanel.add(mostraTempo, gridBagConstraints);
 		
 		descricaoHora2.setPreferredSize(new Dimension(200,25));
@@ -101,7 +65,6 @@ public class TelaTempoThread extends JDialog {
 		
 		mostraTempo2.setPreferredSize(new Dimension(200,25));
 		gridBagConstraints.gridy ++;
-		mostraTempo2.setEditable(false);
 		jPanel.add(mostraTempo2, gridBagConstraints);
 
 		gridBagConstraints.gridwidth = 1;
@@ -118,33 +81,33 @@ public class TelaTempoThread extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				thread1Tempo = new Thread(thread1);
-				thread1Tempo.start();
-				
-				thread2Tempo = new Thread(thread2);
-				thread2Tempo.start();
-				
-				jButton.setEnabled(false);
-				jButton2.setEnabled(true);
+
+			if ( fila == null) {
+				fila = new ImplementacaoFilaThread();
+				fila.start();
 			}
+			
+			for(int qtd = 0; qtd < 100; qtd++) {
+				ObjetoFilaThread filaThread = new ObjetoFilaThread();
+				filaThread.setNome(mostraTempo.getText() + " " + qtd);
+				filaThread.setEmail(mostraTempo2.getText());
+				
+				fila.add(filaThread);
+			}}
 		});
+		
 		
 		jButton2.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
-				thread1Tempo.stop();
-				thread2Tempo.stop();
-				
-				jButton.setEnabled(true);
-				jButton2.setEnabled(false);
+
+			fila.stop();	
+			fila = null;
 			}
 		});
 		
-		jButton2.setEnabled(false);
-		
+		fila.start();
 		add(jPanel, BorderLayout.WEST);
 		setVisible(true);
 	}
